@@ -839,6 +839,19 @@ MspHelper.prototype.process_data = function(dataHandler) {
                     }
                 }
                 break;
+            case MSPCodes.MSP_IMUF_CONFIG:
+                FILTER_CONFIG.imuf_pitch_lpf_cutoff_hz = data.readU16();
+                FILTER_CONFIG.imuf_roll_lpf_cutoff_hz = data.readU16();
+                FILTER_CONFIG.imuf_yaw_lpf_cutoff_hz = data.readU16();
+                FILTER_CONFIG.imuf_pitch_q = data.readU16();
+                FILTER_CONFIG.imuf_roll_q = data.readU16();
+                FILTER_CONFIG.imuf_yaw_q = data.readU16();
+                FILTER_CONFIG.dterm_lpf_hz = data.readU16();                
+                FILTER_CONFIG.dterm_notch_hz = data.readU16();
+                FILTER_CONFIG.dterm_notch_cutoff = data.readU16();
+                FILTER_CONFIG.dterm_filter_type = data.readU8();
+                FILTER_CONFIG.dterm_filter_style = data.readU8();
+                break;
             case MSPCodes.MSP_SET_PID_ADVANCED:
                 console.log("Advanced PID settings saved");
                 break;
@@ -1163,6 +1176,12 @@ MspHelper.prototype.process_data = function(dataHandler) {
             case MSPCodes.MSP_ARMING_DISABLE:
                 console.log('Arming disable');
                 break;
+            case MSPCodes.MSP_IMUF_CONFIG:
+                console.log('Reading IMU-F config.');
+                break;
+            case MSPCodes.MSP_SET_IMUF_CONFIG:
+                console.log('Setting IMU-F config.');
+                break;
             default:
                 console.log('Unknown code detected: ' + code);
         } else {
@@ -1470,6 +1489,19 @@ MspHelper.prototype.crunch = function(code) {
                     buffer.push8(FILTER_CONFIG.dterm_filter_type);
                 }
             }
+            break;
+        case MSPCodes.MSP_SET_IMUF_CONFIG:
+            buffer.push16(FILTER_CONFIG.imuf_pitch_lpf_cutoff_hz)
+                  .push16(FILTER_CONFIG.imuf_roll_lpf_cutoff_hz)
+                  .push16(FILTER_CONFIG.imuf_yaw_lpf_cutoff_hz)
+                  .push16(FILTER_CONFIG.imuf_pitch_q)
+                  .push16(FILTER_CONFIG.imuf_roll_q)
+                  .push16(FILTER_CONFIG.imuf_yaw_q)
+                  .push16(FILTER_CONFIG.dterm_lpf_hz)
+                  .push16(FILTER_CONFIG.dterm_notch_hz)
+                  .push16(FILTER_CONFIG.dterm_notch_cutoff)
+                  .push8(FILTER_CONFIG.dterm_filter_type)
+                  .push8(FILTER_CONFIG.dterm_filter_style)
             break;
         case MSPCodes.MSP_SET_PID_ADVANCED:
             if (semver.gte(CONFIG.apiVersion, "1.20.0")) {
